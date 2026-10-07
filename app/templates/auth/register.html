@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar Akun • Kana Chat{% endblock %}
+
+{% block flashes %}{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 32px auto;">
+  <div class="card card-pad" style="padding: 28px;">
+    <div class="page-head" style="margin-bottom: 18px;">
+      <h1 style="font-size: 20px;">Daftar Akun</h1>
+      <p>Buat akun baru untuk mulai belajar Hiragana &amp; Katakana</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="margin-bottom: 16px;">
+          {% for category, message in messages %}
+            <div class="flash {% if category == 'error' %}flash-error{% else %}flash-success{% endif %}" role="status">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('auth.register') }}">
+      <div class="field">
+        <label>Daftar sebagai</label>
+        <div class="grid-2">
+          <label style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--hairline); border-radius: 8px; cursor: pointer; font-size: 13.5px;">
+            <input type="radio" name="role" value="student" checked />
+            <span><strong>Siswa</strong></span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--hairline); border-radius: 8px; cursor: pointer; font-size: 13.5px;">
+            <input type="radio" name="role" value="teacher" />
+            <span><strong>Guru</strong></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" class="input" name="username" id="username" required autofocus
+               value="{{ username or '' }}" placeholder="Pilih username" />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" class="input" name="password" id="password" required minlength="6"
+               placeholder="Minimal 6 karakter" />
+      </div>
+
+      <div class="field">
+        <label for="confirm_password">Konfirmasi Password</label>
+        <input type="password" class="input" name="confirm_password" id="confirm_password" required minlength="6"
+               placeholder="Ulangi password" />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Daftar</button>
+    </form>
+
+    <div class="muted small" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--hairline); text-align: center;">
+      Sudah punya akun? <a href="{{ url_for('auth.login') }}" style="color: var(--accent); font-weight: 700;">Masuk di sini</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

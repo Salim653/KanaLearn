@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Editor Konten • Kana Chat{% endblock %}
+{% block content %}
+  <div class="page-head" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+    <div>
+      <h1>Editor Konten</h1>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <a href="{{ url_for('content.chat_new') }}" class="btn btn-primary btn-sm">Chat baru</a>
+      <a href="{{ url_for('content.character_new') }}" class="btn btn-ink btn-sm">Karakter baru</a>
+      <a href="{{ url_for('content.kana_list') }}" class="btn btn-ghost btn-sm">Jelajahi Kana ({{ kana_count }})</a>
+    </div>
+  </div>
+
+  <section class="card card-pad" style="margin-bottom: 20px;">
+    <h2 style="font-size: 14px; font-weight: 800; margin: 0 0 10px;">Chat ({{ chats|length }})</h2>
+    {% if chats %}
+      <div style="overflow-x: auto;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width: 48px;">Level</th>
+              <th>Judul</th>
+              <th>Karakter</th>
+              <th>Konteks</th>
+              <th style="width: 72px;">Langkah</th>
+              <th style="text-align: right; width: 130px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for chat in chats %}
+              <tr>
+                <td class="muted" style="font-weight: 700;">{{ chat.level_number }}</td>
+                <td style="font-weight: 700;">{{ chat.title }}</td>
+                <td>{{ chat.character.avatar_emoji }} {{ chat.character.name }}</td>
+                <td class="muted">{{ chat.context_theme or '-' }}</td>
+                <td>{{ chat.steps|length }}</td>
+                <td>
+                  <div style="display: flex; align-items: center; justify-content: flex-end; gap: 6px;">
+                    <a href="{{ url_for('content.chat_edit', chat_id=chat.id) }}" class="btn btn-ghost btn-sm" style="padding: 4px 8px;">Edit</a>
+                    <form method="post" action="{{ url_for('content.chat_delete', chat_id=chat.id) }}"
+                          onsubmit="return confirm('Hapus chat ini beserta langkah dialognya?');">
+                      <button type="submit" class="btn btn-ghost btn-sm" style="padding: 4px 8px; color: var(--error);">Hapus</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state" style="padding: 24px 12px;">
+        <p>Belum ada chat. Jalankan <code>flask seed-content</code> atau buat chat baru.</p>
+        <a href="{{ url_for('content.chat_new') }}" class="btn btn-primary btn-sm">Buat chat pertama</a>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="card card-pad">
+    <h2 style="font-size: 14px; font-weight: 800; margin: 0 0 10px;">Karakter NPC ({{ characters|length }})</h2>
+    {% if characters %}
+      <div class="grid-4" style="align-items: start;">
+        {% for character in characters %}
+          <div style="border: 1px solid var(--hairline); border-radius: 8px; padding: 12px; background: var(--paper);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 22px;" aria-hidden="true">{{ character.avatar_emoji }}</span>
+              <div style="min-width: 0;">
+                <div style="font-weight: 800; font-size: 13px;">
+                  {{ character.name }}
+                  {% if character.katakana_name %}<span class="font-kana muted" style="font-size: 11px; margin-left: 4px;">{{ character.katakana_name }}</span>{% endif %}
+                </div>
+                <div class="muted" style="font-size: 11px;">{{ character.role or '-' }}</div>
+              </div>
+            </div>
+            <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+              <span class="muted" style="font-size: 10.5px;">{{ character.chats|length }} chat</span>
+              <div style="display: flex; gap: 4px;">
+                <a href="{{ url_for('content.character_edit', character_id=character.id) }}" class="btn btn-ghost btn-sm" style="padding: 3px 8px; background: var(--surface);">Edit</a>
+                <form method="post" action="{{ url_for('content.character_delete', character_id=character.id) }}"
+                      onsubmit="return confirm('Hapus karakter ini?');">
+                  <button type="submit" class="btn btn-ghost btn-sm" style="padding: 3px 8px; background: var(--surface); color: var(--error);">Hapus</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted small" style="margin: 0;">Belum ada karakter NPC.</p>
+    {% endif %}
+  </section>
+{% endblock %}

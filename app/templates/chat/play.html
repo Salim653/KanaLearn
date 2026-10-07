@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}{{ chat.title }} • Chat{% endblock %}
+{% block content %}
+  <div id="chat-app" class="card" style="max-width: 672px; margin: 0 auto; height: calc(100vh - 140px); min-height: 500px; display: flex; flex-direction: column; overflow: hidden; position: relative;" data-chat-id="{{ chat.id }}">
+    <!-- Header -->
+    <div style="border-bottom: 1px solid var(--hairline); padding: 10px 16px; display: flex; align-items: center; gap: 10px; flex: none; background: var(--surface); z-index: 10;">
+      <a href="{{ url_for('chat.index') }}" aria-label="Kembali ke daftar chat"
+         style="text-decoration: none; color: var(--ink-muted); font-size: 18px; padding: 4px 10px; border-radius: 8px;">&larr;</a>
+      <div class="chat-avatar" style="width: 40px; height: 40px; font-size: 20px;">{{ chat.character.avatar_emoji }}</div>
+      <div style="min-width: 0;">
+        <h1 style="font-weight: 800; font-size: 13.5px; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ chat.title }}</h1>
+        <p class="muted" style="font-size: 11px; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ chat.character.role }}</p>
+      </div>
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 12px;">
+        <div id="hearts-display" aria-label="sisa nyawa" style="color: var(--accent); font-weight: 800;">
+          {% for _ in range(state.hearts or 5) %}&hearts;{% endfor %}
+        </div>
+        <div id="stars-display" aria-label="bintang" style="font-weight: 800;">
+          {% for _ in range(stars) %}&star;{% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="messages" class="scrollbar-thin" style="flex: 1; overflow-y: auto; padding: 16px; background: var(--paper);">
+      {% for msg in messages %}
+        {% if msg.sender == 'npc' %}
+          <div class="chat-row">
+            <div class="chat-avatar-sm" aria-hidden="true">{{ chat.character.avatar_emoji }}</div>
+            <div class="chat-bubble-wrap">
+              <div class="chat-bubble chat-bubble-npc">
+                <p class="font-kana chat-msg-text chat-msg-npc">{{ msg.text }}</p>
+                {% if msg.romaji %}<p class="chat-msg-sub">{{ msg.romaji }}</p>{% endif %}
+                {% if msg.indonesian %}<p class="chat-msg-sub">{{ msg.indonesian }}</p>{% endif %}
+              </div>
+              {% if msg.is_voice_note %}<p class="chat-msg-sub" style="margin-top: 4px;">Voice note</p>{% endif %}
+            </div>
+          </div>
+        {% elif msg.sender == 'player' %}
+          <div class="chat-row chat-row-player">
+            <div class="chat-bubble chat-bubble-player">
+              <p class="font-kana chat-msg-text">{{ msg.text }}</p>
+              {% if msg.is_handwriting %}<p class="chat-msg-sub chat-msg-sub-invert">Tulisan tangan</p>{% endif %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Typing indicator -->
+    <div id="typing" style="display: none; padding: 8px 16px; font-size: 11px; color: var(--accent); font-weight: 700;">{{ chat.character.name }} sedang mengetik&hellip;</div>
+
+    <!-- Feedback -->
+    <div id="feedback" class="quiz-feedback" style="display: none; margin: 0 16px;"></div>
+
+    <!-- Input area -->
+    <div id="input-area" style="border-top: 1px solid var(--hairline); background: var(--surface); padding: 12px; flex: none;">
+      {% if current_step %}
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <button id="btn-hint" type="button" class="btn btn-ghost btn-sm">Petunjuk</button>
+          <span class="muted" style="font-size: 10.5px;">Minta jawaban jika buntu (mengurangi bintang)</span>
+        </div>
+        <div id="keyboard-panel" style="{% if current_step.is_handwriting_challenge %}display: none;{% endif %}">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <div id="reply-display" class="font-kana" style="flex: 1; min-height: 38px; border: 1px solid var(--hairline); border-radius: 8px; padding: 7px 12px; font-size: 14px; background: var(--paper);"></div>
+          </div>
+          <div id="keyboard" class="kana-keyboard">
+            {% for kana in current_step.available_kana_pool or [] %}
+              <button type="button" class="kana-key font-kana">{{ kana }}</button>
+            {% endfor %}
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <button id="btn-backspace" type="button" class="btn btn-ghost btn-sm">Hapus</button>
+            <button id="btn-clear" type="button" class="btn btn-ghost btn-sm">Reset</button>
+            <button id="btn-send" type="button" class="btn btn-primary btn-sm" style="margin-left: auto;">Kirim</button>
+          </div>
+        </div>
+
+        <div id="handwriting-panel" style="{% if not current_step.is_handwriting_challenge %}display: none;{% endif %}">
+          <p class="small" style="margin: 0 0 8px;">Goreskan huruf <span class="font-kana" style="font-size: 17px; font-weight: 800;">{{ current_step.handwriting_target_char }}</span> di kanvas:</p>
+          <canvas id="hw-canvas" width="300" height="160" style="width: 100%; max-width: 300px; height: 160px; background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px; touch-action: none;"></canvas>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <button id="btn-hw-clear" type="button" class="btn btn-ghost btn-sm">Hapus</button>
+            <button id="btn-hw-send" type="button" class="btn btn-primary btn-sm">Kirim</button>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Completion overlay -->
+    <div id="completion" style="display: none; position: absolute; inset: 0; background: rgba(255, 253, 248, 0.97); flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; z-index: 20;">
+      <div class="font-kana" style="font-size: 56px; font-weight: 800; color: var(--accent); line-height: 1;" aria-hidden="true">成</div>
+      <h2 style="font-size: 20px; font-weight: 800; margin: 12px 0 2px;">Chat selesai!</h2>
+      <p class="small" style="margin: 0 0 16px;">Kamu berhasil menyelesaikan percakapan ini.</p>
+      <div id="final-stars" class="font-kana" style="font-size: 22px; font-weight: 800; margin-bottom: 20px;"></div>
+      <div style="display: flex; gap: 10px;">
+        <form method="post" action="{{ url_for('chat.reset', chat_id=chat.id) }}" onsubmit="return confirm('Ulangi chat dari awal? Progres chat ini akan direset.');">
+          <button type="submit" class="btn btn-ghost">Ulangi</button>
+        </form>
+        <a href="{{ url_for('chat.index') }}" class="btn btn-primary">Kembali</a>
+      </div>
+    </div>
+
+    <!-- Game over overlay -->
+    <div id="game-over" style="display: none; position: absolute; inset: 0; background: rgba(255, 253, 248, 0.97); flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; z-index: 20;">
+      <div class="font-kana" style="font-size: 56px; font-weight: 800; color: var(--ink); line-height: 1;" aria-hidden="true">終</div>
+      <h2 style="font-size: 20px; font-weight: 800; margin: 12px 0 2px;">Habis kesabaran</h2>
+      <p class="small" style="margin: 0 0 16px;">Jangan menyerah, coba lagi ya!</p>
+      <form method="post" action="{{ url_for('chat.reset', chat_id=chat.id) }}">
+        <button type="submit" class="btn btn-primary">Coba lagi</button>
+      </form>
+    </div>
+  </div>
+
+  <script id="step-data" type="application/json">{{ current_step_data|tojson if current_step_data else 'null' }}</script>
+  <script src="{{ url_for('static', filename='js/tts.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}

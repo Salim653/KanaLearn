@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Dojo Menulis • Kana Chat{% endblock %}
+{% block content %}
+  <div style="max-width: 768px; margin: 0 auto;">
+    <div class="page-head">
+      <h1>Dojo Menulis</h1>
+      <p>Latih goresan kapan saja, tidak mengunci fitur lain.</p>
+    </div>
+
+    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+      <a href="{{ url_for('dojo.index', type='hiragana') }}"
+         class="btn btn-sm {% if kana_type == 'hiragana' %}btn-primary{% else %}btn-ghost{% endif %}">Hiragana</a>
+      <a href="{{ url_for('dojo.index', type='katakana') }}"
+         class="btn btn-sm {% if kana_type == 'katakana' %}btn-primary{% else %}btn-ghost{% endif %}">Katakana</a>
+    </div>
+
+    <section class="card card-pad">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span class="font-kana" style="font-size: 56px; font-weight: 800; line-height: 1;">{{ kana.char }}</span>
+          <div>
+            <p class="muted small" style="margin: 0;">romaji</p>
+            <p style="margin: 0; font-weight: 800;">{{ kana.romaji }}</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-animate" type="button" class="btn btn-ghost btn-sm">Animasi</button>
+          <button id="btn-clear" type="button" class="btn btn-ghost btn-sm">Hapus</button>
+          <button id="btn-eval" type="button" class="btn btn-primary btn-sm">Periksa</button>
+        </div>
+      </div>
+
+      <p class="small" style="margin: 0 0 16px;">{{ kana.mnemonic }}</p>
+
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="position: relative; width: 300px; height: 300px; max-width: 100%;">
+          <!-- Reference SVG from stroke data -->
+          <svg id="reference-svg" style="position: absolute; inset: 0; width: 100%; height: 100%;" viewBox="0 0 109 109" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <rect width="109" height="109" fill="var(--surface)" stroke="var(--hairline)" />
+            <line x1="0" y1="54.5" x2="109" y2="54.5" stroke="var(--hairline)" stroke-dasharray="4" />
+            <line x1="54.5" y1="0" x2="54.5" y2="109" stroke="var(--hairline)" stroke-dasharray="4" />
+            {% for stroke in kana.strokes or [] %}
+              <path d="{{ stroke.path }}" fill="none" stroke="var(--hairline)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="reference-stroke" data-stroke-id="{{ loop.index0 }}" />
+            {% endfor %}
+          </svg>
+          <canvas id="trace-canvas" width="300" height="300" style="position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none;"></canvas>
+        </div>
+        <div id="feedback" class="small" style="margin-top: 12px; font-weight: 700; display: none;"></div>
+        <a id="next-link" href="{{ url_for('dojo.index', type=kana_type) }}" class="btn btn-ghost btn-sm" style="margin-top: 12px;">Kana berikutnya</a>
+      </div>
+    </section>
+
+    <section class="card card-pad" style="margin-top: 16px;">
+      <h2 style="font-size: 14px; font-weight: 800; margin: 0 0 10px;">Pilih huruf</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+        {% for group in grid %}
+          {% for k in group.chars %}
+            <a href="{{ url_for('dojo.index', type=kana_type, char=k.char) }}"
+               class="font-kana" aria-label="Latih {{ k.romaji }}"
+               style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; text-decoration: none; border-radius: 8px; border: 1px solid var(--hairline);
+                 {% if k.char == kana.char %}background: var(--accent); color: var(--surface); border-color: var(--accent);{% else %}background: var(--surface); color: var(--ink);{% endif %}">
+              {{ k.char }}
+            </a>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <script id="stroke-data" type="application/json">{{ kana.strokes|tojson if kana.strokes else '[]' }}</script>
+  <script src="{{ url_for('static', filename='js/tts.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/dojo.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Jalur Pelajaran • Kana Chat{% endblock %}
+{% block content %}
+  <div class="page-head" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+    <div>
+      <h1>Jalur Pelajaran</h1>
+      <p>Pilih track dan selesaikan unit demi unit.</p>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <a href="{{ url_for('quiz.index', track='hiragana') }}"
+         class="btn btn-sm {% if track == 'hiragana' %}btn-primary{% else %}btn-ghost{% endif %}">Hiragana</a>
+      <a href="{{ url_for('quiz.index', track='katakana') }}"
+         class="btn btn-sm {% if track == 'katakana' %}btn-primary{% else %}btn-ghost{% endif %}">Katakana</a>
+      <a href="{{ url_for('quiz.leaderboard') }}" class="btn btn-sm btn-ink">Papan skor</a>
+    </div>
+  </div>
+
+  {% if units %}
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    {% for row in units %}
+      <section class="card card-pad">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
+          <h2 style="font-size: 15px; font-weight: 800; margin: 0;">{{ row.unit.title }}</h2>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="muted small">{{ row.progress }}% dikuasai</span>
+            <div class="progress" style="width: 110px;"><div class="progress-fill" style="width: {{ row.progress }}%"></div></div>
+          </div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          {% for lesson in row.lessons %}
+            {% set result = row.results.get(lesson.id) %}
+            <a href="{{ url_for('quiz.play', lesson_id=lesson.id) }}"
+               class="chip" style="font-size: 12px; padding: 8px 12px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+                 {% if result %}background: var(--success-wash); color: var(--success);{% elif lesson.kind == 'checkpoint' %}background: var(--accent-wash); color: var(--accent-dark);{% else %}color: var(--ink);{% endif %}">
+              <span class="font-kana" style="font-size: 15px; font-weight: 800;" aria-hidden="true">{% if lesson.kind == 'checkpoint' %}関{% elif lesson.kind == 'practice' %}復{% else %}読{% endif %}</span>
+              {{ lesson.title }}
+              {% if result %}<span class="muted" style="font-size: 10.5px;">{{ result.correct }}/{{ result.total }}</span>{% endif %}
+            </a>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card empty-state">
+    <div class="glyph font-kana" aria-hidden="true">問</div>
+    <p>Belum ada pelajaran di track ini. Guru bisa menambahkannya lewat Editor Konten.</p>
+  </div>
+  {% endif %}
+{% endblock %}

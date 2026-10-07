@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Buat Kelas • Kana Chat{% endblock %}
+{% block content %}
+  <div style="max-width: 420px; margin: 32px auto;">
+    <div class="card card-pad" style="padding: 28px;">
+      <div class="page-head">
+        <h1 style="font-size: 20px;">Buat Kelas Baru</h1>
+      </div>
+      <form method="post">
+        <div class="field">
+          <label for="name">Nama Kelas</label>
+          <input type="text" class="input" id="name" name="name" value="{{ name }}" required maxlength="120"
+                 placeholder="Contoh: Bahasa Jepang XII-A" />
+        </div>
+        {% if current_user.is_admin %}
+          <div class="field">
+            <label for="teacher_username">Pengajar (username, opsional)</label>
+            <input type="text" class="input" id="teacher_username" name="teacher_username"
+                   placeholder="Kosongkan = atas nama Anda" />
+          </div>
+        {% endif %}
+        <div style="display: flex; gap: 10px; padding-top: 6px;">
+          <a href="{{ url_for('classes.class_list') }}" class="btn btn-ghost">Batal</a>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Buat Kelas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

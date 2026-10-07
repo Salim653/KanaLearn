@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Chat • Kana Chat{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <h1>Pilih Percakapan</h1>
+    <p>Tiap chat punya konteks berbeda. Mulai dari mana saja, tidak ada yang terkunci.</p>
+  </div>
+
+  {% if chats %}
+  <div class="grid-2" style="align-items: start;">
+    {% for chat in chats %}
+      {% set state = states.get(chat.id) %}
+      <div class="card card-pad card-hover chat-card">
+        <div class="chat-avatar" aria-hidden="true">{{ chat.character.avatar_emoji }}</div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+            <div style="min-width: 0;">
+              <h2 class="chat-title">{{ chat.title }}</h2>
+              <p class="chat-meta">{{ chat.character.name }} &middot; {{ chat.context_theme or chat.character.role }}</p>
+            </div>
+            <span class="chip {% if state and state.completed %}chip-done{% elif state %}chip-progress{% endif %}">
+              {% if state and state.completed %}Selesai{% elif state %}Langkah {{ state.current_step_order + 1 }}/{{ chat.steps|length }}{% else %}Belum dimulai{% endif %}
+            </span>
+          </div>
+          <p class="chat-summary">{{ chat.intro_summary }}</p>
+          <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px;">
+            {% for kana in (chat.kanas_introduced or [])[:5] %}
+              <span class="kana-chip">{{ kana }}</span>
+            {% endfor %}
+          </div>
+          <div class="card-actions">
+            <a href="{{ url_for('chat.play', chat_id=chat.id) }}" class="btn btn-primary btn-sm">
+              {% if state and state.completed %}Main lagi{% elif state %}Lanjutkan{% else %}Mulai{% endif %}
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card empty-state">
+    <div class="glyph font-kana" aria-hidden="true">話</div>
+    <p>Belum ada percakapan yang dibuat. Guru bisa menambahnya lewat Editor Konten.</p>
+    {% if current_user.is_teacher or current_user.is_admin %}
+      <a href="{{ url_for('content.index') }}" class="btn btn-primary btn-sm">Buka Editor Konten</a>
+    {% endif %}
+  </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Masuk • Kana Chat{% endblock %}
+
+{% block flashes %}{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 32px auto;">
+  <div class="card card-pad" style="padding: 28px;">
+    <div class="page-head" style="margin-bottom: 18px;">
+      <h1 style="font-size: 20px;">Masuk ke Kana Chat</h1>
+      <p>Lanjutkan latihan membaca dan menulis Hiragana &amp; Katakana</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="margin-bottom: 16px;">
+          {% for category, message in messages %}
+            <div class="flash {% if category == 'error' %}flash-error{% else %}flash-success{% endif %}" role="status">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+      <input type="hidden" name="next" value="{{ request.args.get('next') or '' }}" />
+
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" class="input" name="username" id="username" required autofocus
+               value="{{ username or '' }}" placeholder="Masukkan username" />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" class="input" name="password" id="password" required
+               placeholder="Masukkan password" />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Masuk</button>
+    </form>
+
+    <div class="muted small" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--hairline); text-align: center;">
+      Belum punya akun? <a href="{{ url_for('auth.register') }}" style="color: var(--accent); font-weight: 700;">Daftar sekarang</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

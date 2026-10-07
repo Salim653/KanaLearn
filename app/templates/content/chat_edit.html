@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit Chat' if chat else 'Chat Baru' }} • Kana Chat{% endblock %}
+{% block content %}
+  <p class="small" style="margin: 0 0 6px;"><a href="{{ url_for('content.index') }}" style="color: var(--accent); font-weight: 700; text-decoration: none;">&larr; Daftar konten</a></p>
+  <div class="page-head">
+    <h1>{{ 'Edit Chat' if chat else 'Chat Baru' }}</h1>
+  </div>
+
+  <form method="post"
+        action="{{ url_for('content.chat_edit', chat_id=chat.id) if chat else url_for('content.chat_new') }}"
+        style="margin-bottom: 20px;">
+
+    <section class="card card-pad">
+      <div class="grid-2">
+        {% if chat %}
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Seed ID</label>
+            <div class="input" style="background: var(--paper); font-family: monospace; font-size: 12.5px;">
+              {{ chat.seed_id }}
+              <span class="muted" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10.5px;">&middot; kunci seed, jangan diubah (re-seed mencocokkan lewat ID ini)</span>
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="field">
+          <label for="title">Judul *</label>
+          <input type="text" class="input" id="title" name="title" required value="{{ chat.title if chat else '' }}" />
+        </div>
+
+        <div class="field">
+          <label for="level_number">Urutan level</label>
+          <input type="number" class="input" id="level_number" name="level_number" min="1" value="{{ chat.level_number if chat else next_level }}" />
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="character_id">Karakter (NPC)</label>
+          <select class="select" id="character_id" name="character_id">
+            <option value="">- pilih karakter -</option>
+            {% for character in characters %}
+              <option value="{{ character.id }}" {% if chat and chat.character_id == character.id %}selected{% endif %}>
+                {{ character.avatar_emoji }} {{ character.name }}{% if character.role %} ({{ character.role }}){% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="context_theme">Konteks / tema chat</label>
+          <input type="text" class="input" id="context_theme" name="context_theme" value="{{ chat.context_theme or '' if chat else '' }}"
+                 placeholder="mis. perkenalan di kelas, memesan ramen di kedai" />
+          <p class="help-text">Menentukan situasi percakapan. Tiap chat punya konteks berbeda.</p>
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="intro_summary">Ringkasan untuk siswa</label>
+          <textarea class="textarea" id="intro_summary" name="intro_summary" rows="3">{{ chat.intro_summary or '' if chat else '' }}</textarea>
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="kanas_introduced">Kana yang diperkenalkan (satu per baris)</label>
+          <textarea class="textarea font-kana" id="kanas_introduced" name="kanas_introduced" rows="3">{{ (chat.kanas_introduced or [])|join('\n') if chat else '' }}</textarea>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 16px;">
+        <button type="submit" class="btn btn-primary">{{ 'Simpan Perubahan' if chat else 'Buat Chat' }}</button>
+        <a href="{{ url_for('content.index') }}" class="btn btn-ghost">Batal</a>
+      </div>
+    </section>
+  </form>
+
+  {% if chat %}
+    <section class="card card-pad">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+        <h2 style="font-size: 14px; font-weight: 800; margin: 0;">Langkah Dialog ({{ chat.steps|length }})</h2>
+        <a href="{{ url_for('content.step_new', chat_id=chat.id) }}" class="btn btn-primary btn-sm">Tambah Langkah</a>
+      </div>
+
+      {% if chat.steps %}
+        <div style="overflow-x: auto;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width: 32px;">#</th>
+                <th>Pesan NPC</th>
+                <th style="width: 160px;">Jenis</th>
+                <th style="text-align: right; width: 176px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for step in chat.steps %}
+                <tr>
+                  <td class="muted" style="font-weight: 700;">{{ loop.index }}</td>
+                  <td class="font-kana">
+                    {{ step.npc_message[:60] }}{% if step.npc_message|length > 60 %}&hellip;{% endif %}
+                  </td>
+                  <td>
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+                      {% if step.is_voice_note %}
+                        <span class="chip">Voice note</span>
+                      {% endif %}
+                      {% if step.is_handwriting_challenge %}
+                        <span class="chip chip-progress">Tulis tangan</span>
+                      {% endif %}
+                      {% if step.required_reply_kana %}
+                        <span class="font-kana muted" style="font-size: 10.5px;">jawab: {{ step.required_reply_kana }}</span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 4px;">
+                      <a href="{{ url_for('content.step_edit', step_id=step.id) }}" class="btn btn-ghost btn-sm" style="padding: 4px 8px;">Edit</a>
+                      <form method="post" action="{{ url_for('content.step_move', step_id=step.id, direction='up') }}">
+                        <button type="submit" title="Naikkan" class="btn btn-ghost btn-sm" style="padding: 4px 8px;">&uarr;</button>
+                      </form>
+                      <form method="post" action="{{ url_for('content.step_move', step_id=step.id, direction='down') }}">
+                        <button type="submit" title="Turunkan" class="btn btn-ghost btn-sm" style="padding: 4px 8px;">&darr;</button>
+                      </form>
+                      <form method="post" action="{{ url_for('content.step_delete', step_id=step.id) }}"
+                            onsubmit="return confirm('Hapus langkah ini?');">
+                        <button type="submit" class="btn btn-ghost btn-sm" style="padding: 4px 8px; color: var(--error);">Hapus</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="muted small" style="margin: 0;">Belum ada langkah dialog. Tambahkan yang pertama.</p>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('content.chat_delete', chat_id=chat.id) }}"
+            onsubmit="return confirm('Hapus chat ini beserta seluruh langkah dialognya?');" style="margin-top: 18px;">
+        <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--error);">Hapus chat ini</button>
+      </form>
+    </section>
+  {% endif %}
+{% endblock %}

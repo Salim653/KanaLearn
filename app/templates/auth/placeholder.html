@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} • Kana Chat{% endblock %}
+
+{% block content %}
+  <div style="max-width: 420px; margin: 40px auto;">
+    <div class="card card-pad empty-state">
+      <div class="glyph font-kana" aria-hidden="true">未</div>
+      <h2 style="font-size: 17px; margin: 12px 0 0;">{{ title }}</h2>
+      <p>
+        Halaman ini adalah stub scaffold (P0). Fungsinya dibangun pada fase <strong>{{ phase }}</strong>.
+      </p>
+      <a href="{{ url_for('main.home') }}" class="btn btn-ghost btn-sm">Kembali ke Beranda</a>
+    </div>
+  </div>
+{% endblock %}

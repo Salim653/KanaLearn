@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Admin • Kana Chat{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <h1>Panel Admin</h1>
+  </div>
+
+  <div class="split" style="align-items: start;">
+    <section class="card card-pad">
+      <h2 style="font-size: 14px; font-weight: 800; margin: 0 0 10px;">Pengguna ({{ users|length }})</h2>
+      <div style="overflow-x: auto;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Peran</th>
+              <th style="text-align: right;">Ubah</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+              <tr>
+                <td style="font-weight: 600;">{{ u.username }}</td>
+                <td><span class="chip">{{ u.role }}</span></td>
+                <td>
+                  <form method="post" action="{{ url_for('admin.set_user_role', user_id=u.id) }}" style="display: inline-flex; gap: 6px; align-items: center;">
+                    <select name="role" class="select" style="width: auto; min-height: 30px; padding: 3px 8px; font-size: 12px;">
+                      {% for r in ['student', 'teacher', 'admin'] %}
+                        <option value="{{ r }}" {% if u.role == r %}selected{% endif %}>{{ r }}</option>
+                      {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-ghost btn-sm" style="padding: 4px 8px;"
+                      {% if u.id == current_user.id %}disabled{% endif %}>Simpan</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card card-pad">
+      <h2 style="font-size: 14px; font-weight: 800; margin: 0 0 10px;">Kelas ({{ classes|length }})</h2>
+      {% if classes %}
+        <table class="table">
+          <tbody>
+            {% for c in classes %}
+              <tr>
+                <td><a href="{{ url_for('classes.class_detail', class_id=c.id) }}" style="font-weight: 700; text-decoration: none;">{{ c.name }}</a></td>
+                <td class="muted">{{ c.teacher.username if c.teacher else '-' }}</td>
+                <td class="muted">{{ c.enrollments|length }} siswa</td>
+                <td class="font-kana" style="color: var(--accent); font-weight: 800; text-align: right;">{{ c.join_code }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="muted small" style="margin: 0;">Belum ada kelas.</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

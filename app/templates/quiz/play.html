@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }} • Kuis{% endblock %}
+{% block content %}
+  <div id="quiz-app" class="card" style="max-width: 560px; margin: 0 auto; min-height: 520px; display: flex; flex-direction: column; overflow: hidden;" data-lesson-id="{{ lesson.id }}">
+    <div style="padding: 12px 16px; border-bottom: 1px solid var(--hairline); display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+      <a href="{{ url_for('quiz.index', track=lesson.unit.track) }}" class="muted small" style="font-weight: 700; text-decoration: none;">&larr; Kembali</a>
+      <h1 style="font-size: 13.5px; font-weight: 800; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ lesson.title }}</h1>
+      <div style="display: flex; align-items: center; gap: 10px; font-size: 12px;">
+        <span id="hearts-display" style="color: var(--accent); font-weight: 800;">&hearts;&#xFE0E; 5</span>
+        <span id="progress-display" class="muted" style="font-weight: 700;">1/10</span>
+      </div>
+    </div>
+
+    <div style="flex: 1; padding: 18px; display: flex; flex-direction: column; justify-content: center;">
+      <div id="question-card" style="text-align: center;">
+        <div id="prompt-area"></div>
+        <div id="options-area" class="grid-2" style="margin-top: 16px;"></div>
+        <div id="tiles-area" style="display: none; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px;"></div>
+        <div id="answer-display" class="font-kana" style="font-size: 24px; min-height: 40px; margin-top: 12px;"></div>
+        <div id="feedback-area" style="display: none; margin-top: 12px;"></div>
+      </div>
+    </div>
+
+    <div style="padding: 14px 16px; border-top: 1px solid var(--hairline); display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+      <button id="btn-listen" type="button" class="btn btn-ghost btn-sm">Ulangi audio</button>
+      <button id="btn-submit" type="button" class="btn btn-primary">Periksa</button>
+      <button id="btn-next" type="button" class="btn btn-ink" style="display: none;">Lanjut</button>
+    </div>
+
+    <div id="end-screen" style="display: none; flex: 1; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;">
+      <div class="font-kana" style="font-size: 56px; font-weight: 800; color: var(--accent); line-height: 1;" aria-hidden="true">成</div>
+      <h2 style="font-size: 20px; font-weight: 800; margin: 12px 0 2px;">Pelajaran selesai!</h2>
+      <p class="small" style="margin: 0 0 4px;"><span id="end-accuracy"></span> benar</p>
+      <p style="margin: 0 0 18px; font-weight: 800; color: var(--accent);">+<span id="end-xp"></span> XP</p>
+      <a id="end-link" href="{{ url_for('quiz.index', track=lesson.unit.track) }}" class="btn btn-primary">Kembali ke jalur</a>
+    </div>
+  </div>
+
+  <script id="lesson-meta" type="application/json">{"track":"{{ lesson.unit.track }}"}</script>
+  <script src="{{ url_for('static', filename='js/tts.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+{% endblock %}

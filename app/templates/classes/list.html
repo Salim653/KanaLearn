@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Kelas • Kana Chat{% endblock %}
+{% block content %}
+  <div class="page-head" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+    <div>
+      <h1>Kelas Saya</h1>
+    </div>
+    {% if current_user.is_teacher or current_user.is_admin %}
+      <a href="{{ url_for('classes.class_new') }}" class="btn btn-primary btn-sm">Buat Kelas</a>
+    {% else %}
+      <a href="{{ url_for('classes.join_class') }}" class="btn btn-primary btn-sm">Gabung Kelas</a>
+    {% endif %}
+  </div>
+
+  {% if classes %}
+    <div class="grid-3" style="align-items: start;">
+      {% for c in classes %}
+        <a href="{{ url_for('classes.class_detail', class_id=c.id) }}" class="card card-pad card-hover" style="text-decoration: none; display: block;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <h3 style="margin: 0; font-weight: 800; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ c.name }}</h3>
+            <span class="chip">{{ c.enrollments|length }} siswa</span>
+          </div>
+          <p class="muted small" style="margin: 4px 0 0;">Pengajar: {{ c.teacher.username if c.teacher else '-' }}</p>
+          {% if current_user.is_teacher or current_user.is_admin %}
+            <p class="font-kana" style="margin: 12px 0 0; font-weight: 800; color: var(--accent);">Kode: {{ c.join_code }}</p>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card empty-state">
+      <div class="glyph font-kana" aria-hidden="true">組</div>
+      <p>
+        Belum ada kelas.
+        {% if current_user.is_student %}Gabung dengan kode dari gurumu.{% else %}Buat kelas baru untuk memulai.{% endif %}
+      </p>
+      {% if current_user.is_student %}
+        <a href="{{ url_for('classes.join_class') }}" class="btn btn-primary btn-sm">Gabung Kelas</a>
+      {% elif current_user.is_teacher or current_user.is_admin %}
+        <a href="{{ url_for('classes.class_new') }}" class="btn btn-primary btn-sm">Buat Kelas</a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

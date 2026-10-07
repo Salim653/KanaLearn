@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Baca &amp; tulis <span class="accent font-kana">かな</span> lewat obrolan</h1>
+      <p>
+        Hiragana dan Katakana dipelajari lewat chat bertema, kuis bertahap, dan latihan
+        goresan di Dojo. Untuk siswa dan guru.
+      </p>
+      <div class="hero-actions">
+        {% if current_user.is_authenticated %}
+          {% if current_user.is_student %}
+            <a href="{{ url_for('chat.index') }}" class="btn btn-primary">Mulai ngobrol</a>
+            <a href="{{ url_for('quiz.index') }}" class="btn btn-ghost">Ikut kuis</a>
+          {% else %}
+            <a href="{{ url_for('main.teacher_dashboard') }}" class="btn btn-primary">Buka dashboard</a>
+            <a href="{{ url_for('content.index') }}" class="btn btn-ghost">Kelola konten</a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Buat akun</a>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Masuk</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="hero-kana" aria-hidden="true">
+      <div>
+        あ
+        <span class="ro">a</span>
+      </div>
+    </div>
+  </section>
+
+  {% if current_user.is_authenticated %}
+    {% if current_user.is_student %}
+      <section class="band" aria-label="Progres kamu">
+        <div class="card card-pad">
+          <div class="stat-row">
+            <div>
+              <div class="stat-num">{{ stats.completed_chats }}</div>
+              <div class="stat-label">chat selesai</div>
+            </div>
+            <div>
+              <div class="stat-num">{{ stats.xp }}</div>
+              <div class="stat-label">XP kuis</div>
+            </div>
+            <div>
+              <div class="stat-num">{{ stats.mastered }}</div>
+              <div class="stat-label">kana dikuasai</div>
+            </div>
+            <div>
+              <div class="stat-num">{{ stats.enrolled }}</div>
+              <div class="stat-label">kelas diikuti</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="band" aria-label="Fitur utama">
+        <div class="band-head">
+          <h2>Lanjutkan belajar</h2>
+        </div>
+        <div class="seal-grid">
+          <a href="{{ url_for('chat.index') }}">
+            <span class="glyph font-kana">話</span>
+            <span class="label">Obrolan</span>
+            <span class="stat">{{ stats.completed_chats }} selesai</span>
+          </a>
+          <a href="{{ url_for('quiz.index') }}">
+            <span class="glyph font-kana">問</span>
+            <span class="label">Kuis</span>
+            <span class="stat">{{ stats.xp }} XP</span>
+          </a>
+          <a href="{{ url_for('dojo.index') }}">
+            <span class="glyph font-kana">書</span>
+            <span class="label">Dojo Menulis</span>
+            <span class="stat">Latihan goresan</span>
+          </a>
+          <a href="{{ url_for('classes.class_list') }}">
+            <span class="glyph font-kana">組</span>
+            <span class="label">Kelas</span>
+            <span class="stat">{{ stats.enrolled }} kelas</span>
+          </a>
+        </div>
+      </section>
+    {% else %}
+      <section class="band" aria-label="Alat guru">
+        <div class="band-head">
+          <h2>Alat mengajar</h2>
+        </div>
+        <div class="seal-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <a href="{{ url_for('main.teacher_dashboard') }}">
+            <span class="glyph font-kana">図</span>
+            <span class="label">Dashboard</span>
+            <span class="stat">Progres kelas &amp; siswa</span>
+          </a>
+          <a href="{{ url_for('content.index') }}">
+            <span class="glyph font-kana">編</span>
+            <span class="label">Editor Konten</span>
+            <span class="stat">Chat, karakter, kana</span>
+          </a>
+          <a href="{{ url_for('admin.index') }}">
+            <span class="glyph font-kana">管</span>
+            <span class="label">Panel Admin</span>
+            <span class="stat">Pengguna &amp; peran</span>
+          </a>
+        </div>
+      </section>
+    {% endif %}
+  {% else %}
+    <section class="band" aria-label="Mulai">
+      <div class="split">
+        <div class="card card-pad">
+          <h2 class="mt-0" style="font-size: 16px;">Sudah punya akun?</h2>
+          <p class="muted small" style="margin-top: 4px;">Masuk untuk melanjutkan progres chat, kuis, dan kelas kamu.</p>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-ink btn-sm">Masuk</a>
+        </div>
+        <div class="card card-pad">
+          <h2 class="mt-0" style="font-size: 16px;">Baru di sini?</h2>
+          <p class="muted small" style="margin-top: 4px;">Buat akun siswa, lalu gabung ke kelas dengan kode dari gurumu.</p>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Buat akun</a>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

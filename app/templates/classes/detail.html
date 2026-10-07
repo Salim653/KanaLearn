@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ classroom.name }} • Kana Chat{% endblock %}
+{% block content %}
+  <div class="page-head" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+    <div>
+      <h1>{{ classroom.name }}</h1>
+      <p>Pengajar: {{ classroom.teacher.username if classroom.teacher else '-' }}</p>
+    </div>
+    {% if is_manager %}
+      <div style="text-align: right;">
+        <div class="muted" style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;">Kode Gabung</div>
+        <div class="font-kana" style="font-size: 26px; font-weight: 800; color: var(--accent); letter-spacing: 0.1em;">{{ classroom.join_code }}</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <section class="card card-pad">
+    <h2 style="font-size: 14px; font-weight: 800; margin: 0 0 10px;">Siswa ({{ students|length }})</h2>
+    {% if students %}
+      <table class="table">
+        <tbody>
+        {% for s in students %}
+          <tr>
+            <td style="font-weight: 600;">{{ s.username }}</td>
+            <td style="text-align: right;">
+              {% if is_manager %}
+                <form method="post" action="{{ url_for('classes.class_remove_student', class_id=classroom.id, student_id=s.id) }}"
+                      onsubmit="return confirm('Keluarkan {{ s.username }} dari kelas?');">
+                  <button type="submit" class="btn btn-ghost btn-sm" style="border-color: transparent; color: var(--error); padding: 4px 8px;">Keluarkan</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state" style="padding: 28px 12px;">
+        <div class="glyph font-kana" aria-hidden="true">人</div>
+        <p style="margin-bottom: 0;">Belum ada siswa terdaftar. Bagikan kode gabung di atas.</p>
+      </div>
+    {% endif %}
+
+    <p style="margin: 16px 0 0;"><a href="{{ url_for('classes.class_list') }}" class="muted small" style="font-weight: 700; text-decoration: none;">&larr; Kembali ke daftar kelas</a></p>
+  </section>
+{% endblock %}

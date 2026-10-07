@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit Langkah' if step else 'Langkah Baru' }} • Kana Chat{% endblock %}
+{% block content %}
+  <p class="small" style="margin: 0 0 6px;"><a href="{{ url_for('content.chat_edit', chat_id=chat.id) }}" style="color: var(--accent); font-weight: 700; text-decoration: none;">&larr; Kembali ke chat</a></p>
+  <div class="page-head">
+    <h1>{{ 'Edit Langkah Dialog' if step else 'Tambah Langkah Dialog' }}</h1>
+    <p>{{ chat.character.avatar_emoji }} <strong>{{ chat.title }}</strong> &middot; {{ chat.character.name }}</p>
+  </div>
+
+  <form method="post"
+        action="{{ url_for('content.step_edit', step_id=step.id) if step else url_for('content.step_new', chat_id=chat.id) }}"
+        style="display: flex; flex-direction: column; gap: 16px;">
+
+    <section class="card card-pad">
+      <h2 style="font-size: 14px; font-weight: 800; margin: 0 0 12px;">Pesan NPC</h2>
+      <div class="grid-2">
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="npc_message">Pesan (bahasa Jepang) *</label>
+          <textarea class="textarea font-kana" id="npc_message" name="npc_message" rows="3" required>{{ step.npc_message if step else '' }}</textarea>
+        </div>
+        <div class="field">
+          <label for="npc_romaji">Romaji</label>
+          <textarea class="textarea" id="npc_romaji" name="npc_romaji" rows="2">{{ step.npc_romaji or '' if step else '' }}</textarea>
+        </div>
+        <div class="field">
+          <label for="npc_indonesian">Terjemahan Indonesia</label>
+          <textarea class="textarea" id="npc_indonesian" name="npc_indonesian" rows="2">{{ step.npc_indonesian or '' if step else '' }}</textarea>
+        </div>
+        <div class="help-text" style="grid-column: 1 / -1; background: var(--paper); border: 1px solid var(--hairline); border-radius: 8px; padding: 8px 12px;">
+          Placeholder <code>{PLAYER_NAME}</code> pada pesan NPC diganti otomatis dengan username siswa saat chat berjalan.
+        </div>
+      </div>
+    </section>
+
+    <section class="card card-pad">
+      <h2 style="font-size: 14px; font-weight: 800; margin: 0 0 12px;">Jawaban siswa</h2>
+      <div class="grid-2">
+        <div class="field">
+          <label for="required_reply_kana">Jawaban wajib (kana)</label>
+          <input type="text" class="input font-kana" id="required_reply_kana" name="required_reply_kana" value="{{ step.required_reply_kana or '' if step else '' }}" />
+        </div>
+        <div class="field">
+          <label for="required_reply_romaji">Jawaban wajib (romaji)</label>
+          <input type="text" class="input" id="required_reply_romaji" name="required_reply_romaji" value="{{ step.required_reply_romaji or '' if step else '' }}" />
+        </div>
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="required_reply_indonesian">Arti jawaban (Indonesia)</label>
+          <input type="text" class="input" id="required_reply_indonesian" name="required_reply_indonesian" value="{{ step.required_reply_indonesian or '' if step else '' }}" />
+        </div>
+        <div class="field">
+          <label for="allowed_alternatives">Alternatif jawaban (satu per baris)</label>
+          <textarea class="textarea font-kana" id="allowed_alternatives" name="allowed_alternatives" rows="3">{{ (step.allowed_alternatives or [])|join('\n') if step else '' }}</textarea>
+        </div>
+        <div class="field">
+          <label for="available_kana_pool">Pool huruf keyboard (satu per baris)</label>
+          <textarea class="textarea font-kana" id="available_kana_pool" name="available_kana_pool" rows="3">{{ (step.available_kana_pool or [])|join('\n') if step else '' }}</textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="card card-pad">
+      <h2 style="font-size: 14px; font-weight: 800; margin: 0 0 12px;">Reaksi &amp; mode</h2>
+      <div class="grid-2">
+        <div class="field">
+          <label for="wrong_reaction">Reaksi saat salah</label>
+          <textarea class="textarea" id="wrong_reaction" name="wrong_reaction" rows="2">{{ step.wrong_reaction or '' if step else '' }}</textarea>
+        </div>
+        <div class="field">
+          <label for="wrong_reaction_romaji">Reaksi saat salah (romaji)</label>
+          <textarea class="textarea" id="wrong_reaction_romaji" name="wrong_reaction_romaji" rows="2">{{ step.wrong_reaction_romaji or '' if step else '' }}</textarea>
+        </div>
+        <div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+            <input type="checkbox" name="is_voice_note" value="1"
+                   {% if step and step.is_voice_note %}checked{% endif %} />
+            Kirim sebagai voice note (dibacakan TTS)
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+            <input type="checkbox" name="is_handwriting_challenge" value="1"
+                   {% if step and step.is_handwriting_challenge %}checked{% endif %} />
+            Tantangan menulis tangan
+          </label>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <label class="muted" style="font-size: 11px; font-weight: 700;">Huruf target</label>
+            <input type="text" class="input font-kana" name="handwriting_target_char" maxlength="8"
+                   value="{{ step.handwriting_target_char or '' if step else '' }}" placeholder="あ"
+                   style="width: 90px; min-height: 34px;" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button type="submit" class="btn btn-primary">{{ 'Simpan Perubahan' if step else 'Simpan Langkah' }}</button>
+      <a href="{{ url_for('content.chat_edit', chat_id=chat.id) }}" class="btn btn-ghost">Batal</a>
+    </div>
+  </form>
+{% endblock %}

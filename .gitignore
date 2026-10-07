@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Databases (dev/prod state, not source)
+*.sqlite3
+*.db
+instance/
+
+# Flask
+.env
+.flaskenv
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Node (none expected, but guard anyway)
+node_modules/

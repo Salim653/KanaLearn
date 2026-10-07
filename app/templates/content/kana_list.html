@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Kana • Editor Konten{% endblock %}
+{% block content %}
+  <p class="small" style="margin: 0 0 6px;"><a href="{{ url_for('content.index') }}" style="color: var(--accent); font-weight: 700; text-decoration: none;">&larr; Daftar konten</a></p>
+  <div class="page-head">
+    <h1>Kamus Kana <span class="muted" style="font-size: 15px; font-weight: 600;">({{ kanas|length }} ditampilkan)</span></h1>
+  </div>
+
+  <form method="get" action="{{ url_for('content.kana_list') }}" class="card card-pad"
+        style="margin-bottom: 16px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px;">
+    <div class="field" style="margin: 0;">
+      <label for="type">Jenis</label>
+      <select name="type" id="type" class="select" style="width: auto;">
+        {% for value, label in [('all', 'Semua'), ('hiragana', 'Hiragana'), ('katakana', 'Katakana')] %}
+          <option value="{{ value }}" {% if kana_type == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field" style="margin: 0; flex: 1; min-width: 180px;">
+      <label for="q">Cari huruf atau romaji</label>
+      <input type="text" class="input" name="q" id="q" value="{{ query }}" placeholder="あ / a" />
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Cari</button>
+  </form>
+
+  <section class="card card-pad">
+    {% if kanas %}
+      <div style="overflow-x: auto;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width: 56px;">Huruf</th>
+              <th style="width: 80px;">Romaji</th>
+              <th style="width: 96px;">Jenis</th>
+              <th style="width: 64px;">Baris</th>
+              <th>Mnemonik</th>
+              <th style="text-align: right; width: 72px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for kana in kanas %}
+              <tr>
+                <td class="font-kana" style="font-size: 22px; font-weight: 800;">{{ kana.char }}</td>
+                <td style="font-weight: 700;">{{ kana.romaji }}</td>
+                <td><span class="chip">{{ kana.type }}</span></td>
+                <td class="muted">{{ kana.row }}</td>
+                <td class="muted" style="font-size: 12px;">
+                  {% if kana.mnemonic %}{{ kana.mnemonic[:70] }}{% if kana.mnemonic|length > 70 %}&hellip;{% endif %}{% else %}-{% endif %}
+                </td>
+                <td style="text-align: right;">
+                  <a href="{{ url_for('content.kana_edit', kana_id=kana.id, type=kana_type) }}" class="btn btn-ghost btn-sm" style="padding: 4px 8px;">Edit</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state" style="padding: 24px 12px;">
+        <div class="glyph font-kana" aria-hidden="true">字</div>
+        <p>Tidak ada kana yang cocok. Jalankan <code>flask seed-content</code> bila kamus masih kosong.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

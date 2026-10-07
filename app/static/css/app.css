@@ -1,0 +1,360 @@
+/* ==========================================================================
+   Kana Chat - washi & ink design system
+   Per DESIGN.md: paper surfaces, sumi ink text, one vermillion accent.
+   Semantic classes (no utility framework); kana type in M PLUS Rounded 1c.
+   ========================================================================== */
+
+:root {
+  --paper: #f7f3ec;
+  --surface: #fffdf8;
+  --ink: #26221c;
+  --ink-muted: #6b6254;
+  --accent: #c93a2e;
+  --accent-dark: #a52d23;
+  --accent-wash: #f6e3e0;
+  --hairline: #e4dccb;
+  --success: #3f6b4f;
+  --success-wash: #e6ede8;
+  --error: #a03127;
+  --error-wash: #f6e0dd;
+  --shadow-float: 0 8px 24px rgba(38, 34, 28, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-kana { font-family: 'M PLUS Rounded 1c', sans-serif; }
+
+a { color: inherit; }
+
+/* --- Focus: always visible (R-32) --- */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- Layout --- */
+.wrap { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+main.wrap { padding-top: 28px; padding-bottom: 48px; flex: 1; }
+
+/* --- Header --- */
+.site-header {
+  position: sticky; top: 0; z-index: 30;
+  background: var(--surface);
+  border-bottom: 1px solid var(--hairline);
+}
+.site-header .wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding-top: 12px; padding-bottom: 12px;
+}
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand-seal {
+  width: 40px; height: 40px; flex: none;
+  background: var(--accent); color: var(--surface);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 22px; font-weight: 800;
+}
+.brand-name { font-weight: 800; font-size: 16px; line-height: 1.2; }
+.brand-sub { font-size: 11px; color: var(--ink-muted); }
+.brand-kana {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 10px; font-weight: 700; color: var(--accent);
+  margin-left: 6px;
+}
+
+.main-nav { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.main-nav a {
+  text-decoration: none; font-size: 12.5px; font-weight: 700;
+  color: var(--ink); padding: 7px 10px; border-radius: 8px;
+}
+.main-nav a:hover { background: rgba(38, 34, 28, 0.06); }
+.main-nav a.active { background: var(--accent); color: var(--surface); }
+.nav-user { font-size: 12px; color: var(--ink-muted); padding: 0 4px; }
+.nav-role {
+  font-size: 10px; font-weight: 700; color: var(--ink-muted);
+  border: 1px solid var(--hairline); border-radius: 4px; padding: 1px 6px;
+}
+
+/* Mobile nav: horizontal scroll, no hidden links (R-03) */
+@media (max-width: 720px) {
+  .site-header .wrap { flex-direction: column; align-items: stretch; gap: 8px; }
+  .main-nav {
+    overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .main-nav::-webkit-scrollbar { display: none; }
+  .main-nav a { flex: none; padding: 9px 12px; }
+}
+
+/* --- Buttons --- */
+.btn {
+  display: inline-block; text-decoration: none; text-align: center;
+  font-family: inherit; font-size: 13px; font-weight: 700;
+  border-radius: 8px; padding: 9px 16px; cursor: pointer;
+  border: 1px solid transparent; transition: background-color 120ms ease, border-color 120ms ease;
+  min-height: 38px;
+}
+.btn-primary { background: var(--accent); color: var(--surface); }
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--hairline); }
+.btn-ghost:hover { border-color: var(--ink-muted); }
+.btn-ink { background: var(--ink); color: var(--surface); }
+.btn-ink:hover { opacity: 0.85; }
+.btn-sm { padding: 6px 12px; min-height: 32px; font-size: 12px; }
+.btn-block { display: block; width: 100%; }
+
+/* --- Cards & surfaces --- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+}
+.card-pad { padding: 18px; }
+.card-hover { transition: border-color 120ms ease; }
+.card-hover:hover { border-color: var(--ink-muted); }
+
+/* --- Page headings --- */
+.page-head { margin-bottom: 22px; }
+.page-head h1 { font-size: 24px; font-weight: 800; margin: 0; line-height: 1.25; }
+.page-head p { margin: 4px 0 0; font-size: 13px; color: var(--ink-muted); }
+
+/* --- Hero (home) --- */
+.hero {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+.hero-copy { padding: 40px 36px; max-width: 560px; }
+.hero-copy h1 { font-size: 32px; font-weight: 800; margin: 0 0 10px; line-height: 1.15; }
+.hero-copy h1 .accent { color: var(--accent); }
+.hero-copy p { margin: 0; font-size: 14px; color: var(--ink-muted); max-width: 46ch; }
+.hero-actions { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+.hero-kana {
+  align-self: stretch; display: flex; align-items: center; justify-content: center;
+  padding: 24px 36px;
+  border-left: 1px solid var(--hairline);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-weight: 800; font-size: 120px; line-height: 1; color: var(--ink);
+  user-select: none;
+}
+.hero-kana .ro {
+  font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;
+  color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase;
+  display: block; text-align: center; margin-top: 8px;
+}
+@media (max-width: 720px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-copy { padding: 28px 20px; }
+  .hero-kana { border-left: 0; border-top: 1px solid var(--hairline); padding: 20px; font-size: 72px; }
+}
+
+/* --- Kana seal grid (home feature band) --- */
+.seal-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px;
+  background: var(--hairline); border: 1px solid var(--hairline); border-radius: 8px;
+  overflow: hidden; margin-top: 28px;
+}
+.seal-grid a {
+  background: var(--surface); text-decoration: none; padding: 18px 14px;
+  display: flex; flex-direction: column; gap: 4px; min-height: 44px;
+}
+.seal-grid a:hover { background: var(--accent-wash); }
+.seal-grid .glyph {
+  font-family: 'M PLUS Rounded 1c', sans-serif; font-size: 30px; font-weight: 800; line-height: 1;
+}
+.seal-grid .label { font-size: 11px; font-weight: 700; color: var(--ink-muted); }
+.seal-grid .stat { font-size: 11px; color: var(--ink); }
+@media (max-width: 900px) { .seal-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 480px) { .seal-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* --- Section rhythm: alternating bands (RHYTHM 2, deliberate) --- */
+.band { margin-top: 40px; }
+.band-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  margin-bottom: 14px;
+}
+.band-head h2 { font-size: 18px; font-weight: 800; margin: 0; }
+.band-head a { font-size: 12.5px; font-weight: 700; color: var(--accent); text-decoration: none; }
+.band-head a:hover { text-decoration: underline; }
+
+/* --- Split layout --- */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
+
+/* --- Chat / quiz cards --- */
+.chat-card { display: flex; gap: 14px; align-items: flex-start; }
+.chat-avatar {
+  width: 52px; height: 52px; flex: none; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-size: 28px;
+  border: 1px solid var(--hairline);
+}
+.chat-title { font-size: 14px; font-weight: 800; margin: 0; }
+.chat-meta { font-size: 11.5px; color: var(--ink-muted); margin: 1px 0 0; }
+.chat-summary { font-size: 12.5px; color: var(--ink); margin: 8px 0 0; }
+.kana-chip {
+  font-family: 'M PLUS Rounded 1c', sans-serif; font-size: 12px; font-weight: 700;
+  background: var(--paper); border: 1px solid var(--hairline); border-radius: 4px;
+  padding: 1px 6px; display: inline-block;
+}
+.card-actions { margin-top: 12px; }
+
+/* --- Status chips (real states only) --- */
+.chip {
+  font-size: 10.5px; font-weight: 700; border-radius: 4px; padding: 2px 7px;
+  border: 1px solid var(--hairline); color: var(--ink-muted);
+  white-space: nowrap;
+}
+.chip-done { background: var(--success-wash); border-color: transparent; color: var(--success); }
+.chip-progress { background: var(--accent-wash); border-color: transparent; color: var(--accent-dark); }
+
+/* --- Progress --- */
+.progress {
+  height: 8px; background: var(--paper); border: 1px solid var(--hairline);
+  border-radius: 4px; overflow: hidden;
+}
+.progress-fill { height: 100%; background: var(--accent); border-radius: 0; transition: width 200ms ease; }
+
+/* --- Stats row --- */
+.stat-num {
+  font-family: 'M PLUS Rounded 1c', sans-serif; font-size: 26px; font-weight: 800; line-height: 1.1;
+}
+.stat-label { font-size: 11.5px; color: var(--ink-muted); font-weight: 600; }
+.stat-row { display: flex; gap: 28px; flex-wrap: wrap; }
+
+/* --- Tables --- */
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th {
+  text-align: left; font-size: 11px; font-weight: 700; color: var(--ink-muted);
+  border-bottom: 1px solid var(--hairline); padding: 8px 10px;
+}
+.table td { border-bottom: 1px solid var(--hairline); padding: 9px 10px; vertical-align: middle; }
+.table tr:last-child td { border-bottom: 0; }
+
+/* --- Forms --- */
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+.input, .select, .textarea {
+  width: 100%; font-family: inherit; font-size: 14px; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px;
+  padding: 9px 12px; min-height: 40px;
+}
+.textarea { min-height: 90px; resize: vertical; }
+.input:focus, .select:focus, .textarea:focus { border-color: var(--accent); }
+.help-text { font-size: 11.5px; color: var(--ink-muted); margin-top: 4px; }
+.form-error { font-size: 12px; color: var(--error); margin-top: 4px; }
+
+/* --- Flash messages --- */
+.flash { font-size: 13px; font-weight: 600; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; border: 1px solid transparent; }
+.flash-error { background: var(--error-wash); color: var(--error); border-color: rgba(160, 49, 39, 0.25); }
+.flash-success { background: var(--success-wash); color: var(--success); border-color: rgba(63, 107, 79, 0.25); }
+
+/* --- Empty state: motif = big kana + honest label --- */
+.empty-state { text-align: center; padding: 48px 20px; }
+.empty-state .glyph {
+  font-family: 'M PLUS Rounded 1c', sans-serif; font-size: 56px; font-weight: 800;
+  color: var(--hairline); line-height: 1;
+}
+.empty-state p { color: var(--ink-muted); font-size: 13px; margin: 10px auto 16px; max-width: 40ch; }
+
+/* --- Footer --- */
+.site-footer {
+  background: var(--surface); border-top: 1px solid var(--hairline);
+  padding: 18px 0; text-align: center; font-size: 12px; color: var(--ink-muted);
+}
+.site-footer .font-kana { color: var(--ink); font-weight: 700; }
+
+/* --- Misc --- */
+.muted { color: var(--ink-muted); }
+.small { font-size: 12px; }
+.mt-0 { margin-top: 0; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+@media (max-width: 900px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+/* --- Quiz play (classes injected by quiz.js) --- */
+.quiz-kind {
+  font-size: 11px; font-weight: 700; color: var(--ink-muted);
+  text-transform: uppercase; letter-spacing: 0.06em; margin: 0;
+}
+.quiz-prompt { font-size: 30px; font-weight: 800; margin: 6px 0 0; line-height: 1.2; }
+.quiz-option {
+  font-family: 'M PLUS Rounded 1c', sans-serif; font-size: 15px; font-weight: 700;
+  padding: 12px; min-height: 44px; background: var(--surface);
+  border: 1px solid var(--hairline); border-radius: 8px; cursor: pointer;
+  color: var(--ink);
+}
+.quiz-option:hover { border-color: var(--ink-muted); }
+.quiz-option-selected { border-color: var(--accent); background: var(--accent-wash); color: var(--accent-dark); }
+.quiz-tile {
+  font-family: 'M PLUS Rounded 1c', sans-serif; font-size: 14px; font-weight: 700;
+  padding: 8px 12px; min-height: 40px; background: var(--paper);
+  border: 1px solid var(--hairline); border-radius: 8px; cursor: pointer; color: var(--ink);
+  display: inline-flex; align-items: center;
+}
+.quiz-tile:hover { border-color: var(--ink-muted); }
+.quiz-feedback { border-radius: 8px; padding: 8px 12px; font-size: 12.5px; font-weight: 700; }
+.quiz-feedback-success { background: var(--success-wash); color: var(--success); }
+.quiz-feedback-error { background: var(--error-wash); color: var(--error); }
+.quiz-feedback-info { background: var(--paper); color: var(--ink-muted); }
+
+/* --- Chat play (classes injected by chat.js + server-rendered rows) --- */
+.chat-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.chat-row-player { display: flex; justify-content: flex-end; }
+.chat-avatar-sm {
+  width: 32px; height: 32px; flex: none; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+  border: 1px solid var(--hairline); background: var(--surface);
+}
+.chat-bubble-wrap { max-width: 80%; }
+.chat-bubble { border-radius: 8px; padding: 8px 12px; }
+.chat-bubble-player {
+  max-width: 80%; background: var(--accent); color: var(--surface);
+  border-bottom-right-radius: 2px;
+}
+.chat-bubble-npc {
+  background: var(--surface); border: 1px solid var(--hairline);
+  border-bottom-left-radius: 2px;
+}
+.chat-msg-text { font-size: 14px; margin: 0; line-height: 1.5; overflow-wrap: anywhere; }
+.chat-msg-npc { color: var(--ink); }
+.chat-msg-sub { font-size: 10.5px; margin: 3px 0 0; color: var(--ink-muted); }
+.chat-msg-sub-invert { color: rgba(255, 253, 248, 0.8); }
+.kana-keyboard { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.kana-key {
+  font-size: 17px; font-weight: 700; padding: 9px 0; min-height: 44px;
+  background: var(--paper); border: 1px solid var(--hairline); border-radius: 8px;
+  cursor: pointer; color: var(--ink);
+}
+.kana-key:hover { border-color: var(--ink-muted); }
+@media (max-width: 560px) { .kana-keyboard { grid-template-columns: repeat(5, 1fr); } }
+
+/* Scrollbar */
+.scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: var(--hairline); border-radius: 4px; }
+
+/* Reduced motion (MOTION 1 anyway; honor the OS setting) */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

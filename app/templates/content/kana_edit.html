@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ kana.char }} • Kana Chat{% endblock %}
+{% block content %}
+  <p class="small" style="margin: 0 0 6px;"><a href="{{ url_for('content.kana_list', type=return_type) }}" style="color: var(--accent); font-weight: 700; text-decoration: none;">&larr; Daftar kana</a></p>
+
+  <div class="page-head" style="display: flex; align-items: center; gap: 14px;">
+    <span class="font-kana" style="font-size: 44px; font-weight: 800; line-height: 1;">{{ kana.char }}</span>
+    <div>
+      <h1 style="font-size: 22px;">Edit Kana</h1>
+      <span class="chip">{{ kana.type }}</span>
+    </div>
+  </div>
+
+  <form method="post" action="{{ url_for('content.kana_edit', kana_id=kana.id) }}">
+    <input type="hidden" name="return_type" value="{{ return_type }}" />
+
+    <section class="card card-pad">
+      <div class="grid-2">
+        <div class="field">
+          <label for="romaji">Romaji</label>
+          <input type="text" class="input" id="romaji" name="romaji" value="{{ kana.romaji }}" />
+        </div>
+        <div class="field">
+          <label for="row">Baris (gojūon)</label>
+          <select class="select" id="row" name="row">
+            {% for row_id in row_ids %}
+              <option value="{{ row_id }}" {% if kana.row == row_id %}selected{% endif %}>{{ row_id }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="mnemonic">Mnemonik</label>
+          <textarea class="textarea" id="mnemonic" name="mnemonic" rows="3">{{ kana.mnemonic or '' }}</textarea>
+        </div>
+      </div>
+
+      <h2 style="font-size: 14px; font-weight: 800; margin: 20px 0 10px;">Contoh kata</h2>
+      {% set ex = kana.example_word or {} %}
+      <div class="grid-2">
+        <div class="field">
+          <label for="ex_kana">Kana</label>
+          <input type="text" class="input font-kana" id="ex_kana" name="ex_kana" value="{{ ex.kana or '' }}" />
+        </div>
+        <div class="field">
+          <label for="ex_romaji">Romaji</label>
+          <input type="text" class="input" id="ex_romaji" name="ex_romaji" value="{{ ex.romaji or '' }}" />
+        </div>
+        <div class="field">
+          <label for="ex_meaning">Arti (Indonesia)</label>
+          <input type="text" class="input" id="ex_meaning" name="ex_meaning" value="{{ ex.meaning or '' }}" />
+        </div>
+        <div class="field">
+          <label for="ex_emoji">Emoji</label>
+          <input type="text" class="input" id="ex_emoji" name="ex_emoji" value="{{ ex.emoji or '' }}" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="similar_confusions">Huruf yang sering tertukar (satu per baris)</label>
+        <textarea class="textarea font-kana" id="similar_confusions" name="similar_confusions" rows="3">{{ (kana.similar_confusions or [])|join('\n') }}</textarea>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 18px;">
+        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+        <a href="{{ url_for('content.kana_list', type=return_type) }}" class="btn btn-ghost">Batal</a>
+      </div>
+    </section>
+  </form>
+{% endblock %}

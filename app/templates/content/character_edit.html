@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit Karakter' if character else 'Karakter Baru' }} • Kana Chat{% endblock %}
+{% block content %}
+  <p class="small" style="margin: 0 0 6px;"><a href="{{ url_for('content.index') }}" style="color: var(--accent); font-weight: 700; text-decoration: none;">&larr; Daftar konten</a></p>
+  <div class="page-head">
+    <h1>{{ 'Edit Karakter' if character else 'Karakter Baru' }}</h1>
+  </div>
+
+  <form method="post"
+        action="{{ url_for('content.character_edit', character_id=character.id) if character else url_for('content.character_new') }}">
+    <section class="card card-pad">
+      {% if character %}
+        <div class="field">
+          <label>Seed ID</label>
+          <div class="input" style="background: var(--paper); font-family: monospace; font-size: 12.5px;">{{ character.seed_id }}</div>
+        </div>
+      {% endif %}
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="name">Nama *</label>
+          <input type="text" class="input" id="name" name="name" required value="{{ character.name if character else '' }}" />
+        </div>
+        <div class="field">
+          <label for="katakana_name">Nama katakana</label>
+          <input type="text" class="input font-kana" id="katakana_name" name="katakana_name" value="{{ character.katakana_name or '' if character else '' }}" />
+        </div>
+        <div class="field">
+          <label for="role">Peran</label>
+          <input type="text" class="input" id="role" name="role" value="{{ character.role or '' if character else '' }}"
+                 placeholder="mis. Teman Sekelas SMA" />
+        </div>
+        <div class="field">
+          <label for="avatar_emoji">Emoji avatar</label>
+          <input type="text" class="input" id="avatar_emoji" name="avatar_emoji" value="{{ character.avatar_emoji or '' if character else '' }}" placeholder="🌸" />
+        </div>
+        <div class="field">
+          <label for="avatar_bg">Kelas warna avatar (opsional)</label>
+          <input type="text" class="input" id="avatar_bg" name="avatar_bg" value="{{ character.avatar_bg or '' if character else '' }}"
+                 placeholder="Kosongkan untuk gaya bawaan" />
+          <p class="help-text">Gaya bawaan sudah mengikuti desain paper; isi hanya bila perlu warna khusus.</p>
+        </div>
+        <div class="field">
+          <label for="theme_color">Warna tema</label>
+          <input type="text" class="input" id="theme_color" name="theme_color" value="{{ character.theme_color or '' if character else '' }}" placeholder="pink" />
+        </div>
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="personality">Kepribadian</label>
+          <textarea class="textarea" id="personality" name="personality" rows="2">{{ character.personality or '' if character else '' }}</textarea>
+        </div>
+        <div class="field" style="grid-column: 1 / -1;">
+          <label for="greeting_voice_note">Sapaan pembuka (voice note)</label>
+          <textarea class="textarea" id="greeting_voice_note" name="greeting_voice_note" rows="2">{{ character.greeting_voice_note or '' if character else '' }}</textarea>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 16px;">
+        <button type="submit" class="btn btn-primary">{{ 'Simpan Perubahan' if character else 'Buat Karakter' }}</button>
+        <a href="{{ url_for('content.index') }}" class="btn btn-ghost">Batal</a>
+      </div>
+    </section>
+  </form>
+{% endblock %}

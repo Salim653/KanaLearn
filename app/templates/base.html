@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Kana Chat{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a href="{{ url_for('main.home') }}" class="brand" aria-label="Kana Chat, ke halaman utama">
+          <span class="brand-seal font-kana" aria-hidden="true">あ</span>
+          <span>
+            <span class="brand-name">Kana Chat<span class="brand-kana font-kana">かなチャット</span></span>
+            <span class="brand-sub">Belajar Hiragana &amp; Katakana</span>
+          </span>
+        </a>
+
+        <nav class="main-nav" aria-label="Navigasi utama">
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('classes.class_list') }}" {% if request.endpoint == 'classes.class_list' %}class="active" aria-current="page"{% endif %}>Kelas</a>
+            <a href="{{ url_for('chat.index') }}" {% if request.endpoint == 'chat.index' %}class="active" aria-current="page"{% endif %}>Chat</a>
+            <a href="{{ url_for('quiz.index') }}" {% if request.endpoint == 'quiz.index' %}class="active" aria-current="page"{% endif %}>Kuis</a>
+            <a href="{{ url_for('dojo.index') }}" {% if request.endpoint == 'dojo.index' %}class="active" aria-current="page"{% endif %}>Dojo</a>
+            {% if current_user.is_student %}
+              <a href="{{ url_for('classes.join_class') }}" {% if request.endpoint == 'classes.join_class' %}class="active" aria-current="page"{% endif %}>Gabung</a>
+            {% endif %}
+            {% if current_user.is_teacher or current_user.is_admin %}
+              <a href="{{ url_for('classes.class_new') }}" {% if request.endpoint == 'classes.class_new' %}class="active" aria-current="page"{% endif %}>+ Kelas</a>
+              <a href="{{ url_for('main.teacher_dashboard') }}" {% if request.endpoint == 'main.teacher_dashboard' %}class="active" aria-current="page"{% endif %}>Dashboard</a>
+              <a href="{{ url_for('content.index') }}" {% if request.endpoint == 'content.index' %}class="active" aria-current="page"{% endif %}>Konten</a>
+            {% endif %}
+            {% if current_user.is_admin %}
+              <a href="{{ url_for('admin.index') }}" {% if request.endpoint == 'admin.index' %}class="active" aria-current="page"{% endif %}>Admin</a>
+            {% endif %}
+            <span class="nav-user">{{ current_user.username }}</span>
+            <span class="nav-role">{{ current_user.role }}</span>
+            <a href="{{ url_for('auth.logout') }}">Keluar</a>
+          {% else %}
+            <a href="{{ url_for('auth.login') }}">Masuk</a>
+            <a href="{{ url_for('auth.register') }}" class="active">Daftar</a>
+          {% endif %}
+        </nav>
+      </div>
+    </header>
+
+    {% block flashes %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="wrap" style="padding-top: 14px;">
+          {% for category, message in messages %}
+            <div class="flash {% if category == 'error' %}flash-error{% else %}flash-success{% endif %}" role="status">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% endblock %}
+
+    <main class="wrap">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <span class="font-kana">かなチャット</span> &middot; Simulator chat pembelajaran Hiragana &amp; Katakana
+      </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
